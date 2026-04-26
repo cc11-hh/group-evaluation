@@ -88,15 +88,10 @@ function renderTable(members) {
 }
 
 // ======================================
-// Create dropdown (0–5)
+// Create score box
 // ======================================
 function createSelect(user, category) {
-  let html = `<td><select id="${user}_${category}">`;
-  for (let i = 0; i <= 5; i++) {
-    html += `<option value="${i}">${i}</option>`;
-  }
-  html += "</select></td>";
-  return html;
+  return `<td><input type="number" id="${user}_${category}" min="0" max="5" step="1" placeholder="0-5"></td>`;
 }
 
 // ======================================
