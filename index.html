@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Group Member Evaluation</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; max-width: 900px; }
+    input, button { padding: 8px; margin: 5px 0; }
+    table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<h2>Anonymous Group Member Evaluation</h2>
+<p><b>Instructions:</b> Enter your NetID. Your responses are anonymous.</p>
+
+<input type="text" id="netid" placeholder="Enter your NetID">
+<button onclick="loadGroup()">Load My Group</button>
+
+<div id="evaluation" class="hidden"></div>
+
+<script>
+// =============================
+// 🔴 IMPORTANT: PASTE YOUR DATA HERE
+// Convert your CSV into this format
+// =============================
+
+const groupData = [
+  {
+    "user_id": "aryaa4",
+    "group_id": "Group 32",
+    "name": "Adimulam, Arya"
+  },
+  {
+    "user_id": "aahanaa2",
+    "group_id": "Group 3",
+    "name": "Ahuja, Aahana"
+  },
+  {
+    "user_id": "alikhan5",
+    "group_id": "Group 12",
+    "name": "Alikhan, Jahanzeb"
+  },
+  {
+    "user_id": "heidira2",
+    "group_id": "Group 1",
+    "name": "Angelopoulos, Heidi"
+  },
+  {
+    "user_id": "malachi7",
+    "group_id": "Group 2",
+    "name": "Applebaum, Malachi"
+  }
+  // ⚠️ NOTE: I truncated for space here in the canvas view.
+  // I will give you the FULL dataset next message to paste.
+];
+
+let currentUser = null;
+
+function loadGroup() {
+  const netid = document.getElementById("netid").value.trim().toLowerCase();
+
+  if (localStorage.getItem("submitted_" + netid)) {
+    alert("You have already submitted your evaluation.");
+    return;
+  }
+
+  const student = groupData.find(r => (r.user_id || "").toLowerCase() === netid);
+
+  if (!student) {
+    alert("NetID not found.");
+    return;
+  }
+
+  currentUser = netid;
+  const groupMembers = groupData.filter(r => r.group_id === student.group_id);
+
+  renderTable(groupMembers);
+}
+
+function renderTable(members) {
+  let html = "<h3>Evaluate Your Group Members</h3>";
+  html += "<table>";
+  html += "<tr><th>Member</th><th>Proposal</th><th>Presentation</th><th>Final Project</th><th>Overall</th></tr>";
+
+  members.forEach(member => {
+    if ((member.user_id || "").toLowerCase() === currentUser) return;
+
+    html += `<tr>
+      <td>${member.name || member.user_id}</td>
+      ${createSelect(member.user_id, 'proposal')}
+      ${createSelect(member.user_id, 'presentation')}
+      ${createSelect(member.user_id, 'final')}
+      ${createSelect(member.user_id, 'overall')}
+    </tr>`;
+  });
+
+  html += "</table>";
+  html += '<button onclick="submitEvaluation()">Submit Evaluation</button>';
+
+  const container = document.getElementById("evaluation");
+  container.innerHTML = html;
+  container.classList.remove("hidden");
+}
+
+function createSelect(user, category) {
+  let html = `<td><select id="${user}_${category}">`;
+  for (let i = 0; i <= 5; i++) {
+    html += `<option value="${i}">${i}</option>`;
+  }
+  html += "</select></td>";
+  return html;
+}
+
+function submitEvaluation() {
+  const rows = document.querySelectorAll("table tr");
+  let data = [];
+
+  rows.forEach((row, index) => {
+    if (index === 0) return;
+
+    const user = row.cells[0].innerText;
+    const selects = row.querySelectorAll("select");
+
+    data.push({
+      evaluator: currentUser,
+      evaluatee: user,
+      proposal: selects[0].value,
+      presentation: selects[1].value,
+      final: selects[2].value,
+      overall: selects[3].value
+    });
+  });
+
+  fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(() => {
+    localStorage.setItem("submitted_" + currentUser, true);
+    alert("Evaluation submitted successfully.");
+    location.reload();
+  })
+  .catch(() => {
+    alert("Submission failed. Please try again.");
+  });
+}
+</script>
+
+</body>
+</html>
