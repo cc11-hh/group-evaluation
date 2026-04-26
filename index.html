@@ -15,7 +15,7 @@
 <body>
 
 <h2>Anonymous Group Member Evaluation</h2>
-<p><b>Instructions:</b> Enter your NetID. Your responses are anonymous.</p>
+<p><b>Instructions:</b> Enter your NetID.</p>
 
 <input type="text" id="netid" placeholder="Enter your NetID">
 <button onclick="loadGroup()">Load My Group</button>
@@ -23,64 +23,44 @@
 <div id="evaluation" class="hidden"></div>
 
 <script>
-// =============================
-// 🔴 IMPORTANT: PASTE YOUR DATA HERE
-// Convert your CSV into this format
-// =============================
-
-const groupData = [
-  {
-    "user_id": "aryaa4",
-    "group_id": "Group 32",
-    "name": "Adimulam, Arya"
-  },
-  {
-    "user_id": "aahanaa2",
-    "group_id": "Group 3",
-    "name": "Ahuja, Aahana"
-  },
-  {
-    "user_id": "alikhan5",
-    "group_id": "Group 12",
-    "name": "Alikhan, Jahanzeb"
-  },
-  {
-    "user_id": "heidira2",
-    "group_id": "Group 1",
-    "name": "Angelopoulos, Heidi"
-  },
-  {
-    "user_id": "malachi7",
-    "group_id": "Group 2",
-    "name": "Applebaum, Malachi"
-  }
-  // ⚠️ NOTE: I truncated for space here in the canvas view.
-  // I will give you the FULL dataset next message to paste.
-];
+// ======================================
+// 🔴 PASTE YOUR ONE SCRIPT URL HERE
+// ======================================
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLFfweThl_KAX-kOjncvw_dx82PoMaGrBDCM7oI75H4WCbcBFJOKnDpMWmqFpVViaKxA/exec";
 
 let currentUser = null;
 
+// ======================================
+// Load group from Google Sheets (doGet)
+// ======================================
 function loadGroup() {
   const netid = document.getElementById("netid").value.trim().toLowerCase();
 
-  if (localStorage.getItem("submitted_" + netid)) {
-    alert("You have already submitted your evaluation.");
+  if (!netid) {
+    alert("Please enter your NetID");
     return;
   }
 
-  const student = groupData.find(r => (r.user_id || "").toLowerCase() === netid);
+  fetch(SCRIPT_URL + "?netid=" + netid)
+    .then(res => res.json())
+    .then(data => {
+      if (data.error || data.length === 0) {
+        alert("NetID not found.");
+        return;
+      }
 
-  if (!student) {
-    alert("NetID not found.");
-    return;
-  }
-
-  currentUser = netid;
-  const groupMembers = groupData.filter(r => r.group_id === student.group_id);
-
-  renderTable(groupMembers);
+      currentUser = netid;
+      renderTable(data);
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Failed to load group data.");
+    });
 }
 
+// ======================================
+// Render evaluation table
+// ======================================
 function renderTable(members) {
   let html = "<h3>Evaluate Your Group Members</h3>";
   html += "<table>";
@@ -106,6 +86,9 @@ function renderTable(members) {
   container.classList.remove("hidden");
 }
 
+// ======================================
+// Create dropdown (0–5)
+// ======================================
 function createSelect(user, category) {
   let html = `<td><select id="${user}_${category}">`;
   for (let i = 0; i <= 5; i++) {
@@ -115,6 +98,9 @@ function createSelect(user, category) {
   return html;
 }
 
+// ======================================
+// Submit evaluation (doPost)
+// ======================================
 function submitEvaluation() {
   const rows = document.querySelectorAll("table tr");
   let data = [];
@@ -135,17 +121,24 @@ function submitEvaluation() {
     });
   });
 
-  fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+  fetch(SCRIPT_URL, {
     method: "POST",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" }
   })
-  .then(() => {
-    localStorage.setItem("submitted_" + currentUser, true);
-    alert("Evaluation submitted successfully.");
-    location.reload();
+  .then(res => res.json())
+  .then(res => {
+      if (res.status === "duplicate") {
+        alert("You have already submitted.");
+        return;
+      }
+
+      localStorage.setItem("submitted_" + currentUser, true);
+      alert("Evaluation submitted successfully.");
+      location.reload();
   })
-  .catch(() => {
+  .catch(err => {
+    console.error(err);
     alert("Submission failed. Please try again.");
   });
 }
