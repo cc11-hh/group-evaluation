@@ -105,7 +105,7 @@ function submitEvaluation() {
     if (index === 0) return;
 
     const user = row.cells[0].innerText;
-    const selects = row.querySelectorAll("select");
+    const selects = row.querySelectorAll("input");
 
     data.push({
       evaluator: currentUser,
