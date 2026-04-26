@@ -41,19 +41,31 @@ function loadGroup() {
     return;
   }
 
-  fetch(SCRIPT_URL + "?netid=" + netid)
-    .then(res => res.json())
-    .then(data => {
-      if (data.error || data.length === 0) {
-        alert("NetID not found.");
-        return;
-      }
+  fetch(SCRIPT_URL + "?netid=" + netid, {
+    method: "GET",
+    mode: "no-cors"   // 🔴 KEY FIX
+  })
+    .then(res => res.text())
+    .then(text => {
+      console.log("RAW:", text);
 
-      currentUser = netid;
-      renderTable(data);
+      try {
+        const data = JSON.parse(text);
+
+        if (data.error || data.length === 0) {
+          alert("NetID not found.");
+          return;
+        }
+
+        currentUser = netid;
+        renderTable(data);
+      } catch (e) {
+        console.error("Parse error:", e);
+        alert("Error reading server response.");
+      }
     })
     .catch(err => {
-      console.error(err);
+      console.error("FETCH ERROR:", err);
       alert("Failed to load group data.");
     });
 }
