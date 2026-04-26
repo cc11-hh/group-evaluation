@@ -71,7 +71,7 @@ function renderTable(members) {
     if ((member.user_id || "").toLowerCase() === currentUser) return;
 
     html += `<tr>
-      <td>${member.name || member.user_id}</td>
+      <td data-user="${member.user_id}">${member.name || member.user_id}</td>
       ${createSelect(member.user_id, 'proposal')}
       ${createSelect(member.user_id, 'presentation')}
       ${createSelect(member.user_id, 'final')}
@@ -104,7 +104,7 @@ function submitEvaluation() {
   rows.forEach((row, index) => {
     if (index === 0) return;
 
-    const user = row.cells[0].innerText;
+    const user = row.cells[0].dataset.user;
     const selects = row.querySelectorAll("input");
 
     data.push({
