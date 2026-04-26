@@ -110,10 +110,10 @@ function submitEvaluation() {
     data.push({
       evaluator: currentUser,
       evaluatee: user,
-      proposal: selects[0].value,
-      presentation: selects[1].value,
-      final: selects[2].value,
-      overall: selects[3].value
+      proposal: document.getElementById(`${user}_proposal`).value,
+      presentation: document.getElementById(`${user}_presentation`).value,
+      final: document.getElementById(`${user}_final`).value,
+      overall: document.getElementById(`${user}_overall`).value
     });
   });
 
