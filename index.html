@@ -41,10 +41,7 @@ function loadGroup() {
     return;
   }
 
-  fetch(SCRIPT_URL + "?netid=" + netid, {
-    method: "GET",
-    mode: "no-cors"   // 🔴 KEY FIX
-  })
+  fetch(SCRIPT_URL + "?netid=" + netid)
     .then(res => res.text())
     .then(text => {
       console.log("RAW:", text);
