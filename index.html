@@ -16,7 +16,6 @@
 
 <h2>Anonymous Group Member Evaluation</h2>
 <p><b>Instructions:</b> Enter your NetID.</p>
-<p><b>Rating scale:</b> 0–5, where <b>0</b> = no contribution at all, and <b>5</b> = actively contributes.</p>
 
 <input type="text" id="netid" placeholder="Enter your NetID">
 <button onclick="loadGroup()">Load My Group</button>
@@ -64,6 +63,7 @@ function loadGroup() {
 // ======================================
 function renderTable(members) {
   let html = "<h3>Evaluate Your Group Members</h3>";
+  html += "<p><b>Rating scale:</b> 0–5, where <b>0</b> = no contribution at all, and <b>5</b> = actively contributes.</p>";
   html += "<table>";
   html += "<tr><th>Member</th><th>Proposal</th><th>Presentation</th><th>Final Project</th><th>Overall</th></tr>";
 
