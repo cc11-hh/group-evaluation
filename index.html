@@ -105,7 +105,6 @@ function submitEvaluation() {
     if (index === 0) return;
 
     const user = row.cells[0].dataset.user;
-    const selects = row.querySelectorAll("input");
 
     data.push({
       evaluator: currentUser,
@@ -119,19 +118,12 @@ function submitEvaluation() {
 
   fetch(SCRIPT_URL, {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
+    body: JSON.stringify(data)
   })
-  .then(res => res.json())
-  .then(res => {
-      if (res.status === "duplicate") {
-        alert("You have already submitted.");
-        return;
-      }
-
-      localStorage.setItem("submitted_" + currentUser, true);
-      alert("Evaluation submitted successfully.");
-      location.reload();
+  .then(() => {
+    localStorage.setItem("submitted_" + currentUser, true);
+    alert("Evaluation submitted successfully.");
+    location.reload();
   })
   .catch(err => {
     console.error(err);
